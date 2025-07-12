@@ -3,9 +3,10 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ShoppingCart } from "lucide-react"
+import { ShoppingCart, Plus } from "lucide-react"
 import { useState } from "react"
 import Image from "next/image"
+import { useCart } from "@/components/cart-context"
 
 interface Product {
   id: string
@@ -26,9 +27,10 @@ interface ProductCardProps {
 
 export function ProductCardNew({ product }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false)
+  const { addItem } = useCart()
 
-  const handleAddToCart = () => {
-    console.log("Added to cart:", product.id)
+  const handleAddToCart = (unitType: 'unit' | 'bulk') => {
+    addItem(product, unitType)
   }
 
   return (
@@ -85,14 +87,34 @@ export function ProductCardNew({ product }: ProductCardProps) {
             )}
           </div>
 
-          {/* Botón Agregar al Carrito */}
-          <Button
-            onClick={handleAddToCart}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 h-9 text-sm font-semibold"
-          >
-            <ShoppingCart size={16} className="mr-1" />
-            Agregar
-          </Button>
+          {/* Botones Agregar al Carrito */}
+          {product.bulkPrice ? (
+            <div className="space-y-2">
+              <Button
+                onClick={() => handleAddToCart('unit')}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 h-9 text-sm font-semibold"
+              >
+                <Plus size={16} className="mr-1" />
+                Agregar Unidad
+              </Button>
+              <Button
+                onClick={() => handleAddToCart('bulk')}
+                variant="outline"
+                className="w-full border-orange-500 text-orange-600 hover:bg-orange-50 h-9 text-sm font-semibold"
+              >
+                <ShoppingCart size={16} className="mr-1" />
+                Agregar Bulto
+              </Button>
+            </div>
+          ) : (
+            <Button
+              onClick={() => handleAddToCart('unit')}
+              className="w-full bg-emerald-600 hover:bg-emerald-700 h-9 text-sm font-semibold"
+            >
+              <ShoppingCart size={16} className="mr-1" />
+              Agregar
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>

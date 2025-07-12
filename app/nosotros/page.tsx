@@ -6,19 +6,22 @@ import { TestimonialsSection } from "@/components/testimonials-section"
 import { Footer } from "@/components/footer"
 import { WhatsAppButton } from "@/components/whatsapp-button"
 import { FilterProvider } from "@/components/filter-context"
+import { CartProvider } from "@/components/cart-context"
 
 export default function NosotrosPage() {
   return (
-    <FilterProvider>
-      <div className="min-h-screen bg-white">
-        <Header />
-        <HeroSection />
-        <CategoriesGrid />
-        <BenefitsSection />
-        <TestimonialsSection />
-        <Footer />
-        <WhatsAppButton />
-      </div>
-    </FilterProvider>
+    <CartProvider>
+      <FilterProvider>
+        <div className="min-h-screen bg-white">
+          <Header />
+          <HeroSection />
+          <CategoriesGrid />
+          <BenefitsSection />
+          <TestimonialsSection />
+          <Footer />
+          <WhatsAppButton />
+        </div>
+      </FilterProvider>
+    </CartProvider>
   )
 }

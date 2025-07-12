@@ -5,6 +5,8 @@ import { Search, Menu, ShoppingCart, User, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useFilter } from "@/components/filter-context"
+import { useCart } from "@/components/cart-context"
+import { CartModal } from "@/components/cart-modal"
 import { useCategories, useAllSubcategories } from "@/hooks/useProducts"
 import Image from "next/image"
 
@@ -12,6 +14,7 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
   const { searchQuery, setSearchQuery, setSelectedCategoryId, setSelectedSubcategoryId, clearFilters } = useFilter()
+  const { getTotalItems } = useCart()
   
   // Fetch categories and all subcategories from database
   const { categories, loading: categoriesLoading } = useCategories()
@@ -80,12 +83,16 @@ export function Header() {
               <User size={20} className="mr-2" />
               Mi Cuenta
             </Button>
-            <Button variant="ghost" size="sm" className="relative px-3 py-2">
-              <ShoppingCart size={20} />
-              <span className="absolute -top-1 -right-1 bg-orange-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center text-[10px]">
-                3
-              </span>
-            </Button>
+            <CartModal>
+              <Button variant="ghost" size="sm" className="relative px-3 py-2">
+                <ShoppingCart size={20} />
+                {getTotalItems() > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-orange-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center text-[10px]">
+                    {getTotalItems()}
+                  </span>
+                )}
+              </Button>
+            </CartModal>
             <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               <Menu size={20} />
             </Button>
