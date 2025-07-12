@@ -13,7 +13,7 @@ import Image from "next/image"
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
-  const { searchQuery, setSearchQuery, setSelectedCategoryId, setSelectedSubcategoryId, clearFilters } = useFilter()
+  const { searchQuery, setSearchQuery, selectedCategoryName, setSelectedCategoryName, selectedSubcategoryName, setSelectedSubcategoryName, clearFilters } = useFilter()
   const { getTotalItems } = useCart()
   
   // Fetch categories and all subcategories from database
@@ -31,15 +31,15 @@ export function Header() {
     // La búsqueda se maneja automáticamente por el contexto
   }
 
-  const handleCategoryClick = (categoryId: string) => {
-    setSelectedCategoryId(categoryId)
-    setSelectedSubcategoryId(null)
+  const handleCategoryClick = (categoryName: string) => {
+    setSelectedCategoryName(categoryName)
+    setSelectedSubcategoryName(null)
     setIsCategoriesOpen(false)
   }
 
-  const handleSubcategoryClick = (categoryId: string, subcategoryId: string) => {
-    setSelectedCategoryId(categoryId)
-    setSelectedSubcategoryId(subcategoryId)
+  const handleSubcategoryClick = (categoryName: string, subcategoryName: string) => {
+    setSelectedCategoryName(categoryName)
+    setSelectedSubcategoryName(subcategoryName)
     setIsCategoriesOpen(false)
   }
 
@@ -124,18 +124,18 @@ export function Header() {
                 >
                   <div className="grid grid-cols-2 lg:grid-cols-3 gap-0 p-4 w-[600px] lg:w-[800px]">
                     {!categoriesLoading && categories.map((category) => (
-                      <div key={category.id} className="p-3">
+                      <div key={category.name} className="p-3">
                         <h3 
                           className="font-semibold text-emerald-600 text-sm mb-2 border-b border-gray-100 pb-1 cursor-pointer hover:text-emerald-700"
-                          onClick={() => handleCategoryClick(category.id)}
+                          onClick={() => handleCategoryClick(category.name)}
                         >
                           {category.name}
                         </h3>
                         <ul className="space-y-1">
-                          {!subcategoriesLoading && subcategoriesByCategory[category.id]?.map((subcategory) => (
-                            <li key={subcategory.id}>
+                          {!subcategoriesLoading && subcategoriesByCategory[category.name]?.map((subcategory) => (
+                            <li key={subcategory.name}>
                               <button
-                                onClick={() => handleSubcategoryClick(category.id, subcategory.id)}
+                                onClick={() => handleSubcategoryClick(category.name, subcategory.name)}
                                 className="block text-xs text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 px-2 py-1 rounded transition-colors w-full text-left"
                               >
                                 {subcategory.name}

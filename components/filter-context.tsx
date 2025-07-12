@@ -5,10 +5,10 @@ import { createContext, useContext, useState, ReactNode } from "react"
 interface FilterContextType {
   searchQuery: string
   setSearchQuery: (query: string) => void
-  selectedCategoryId: string | null
-  setSelectedCategoryId: (categoryId: string | null) => void
-  selectedSubcategoryId: string | null
-  setSelectedSubcategoryId: (subcategoryId: string | null) => void
+  selectedCategoryName: string | null
+  setSelectedCategoryName: (categoryName: string | null) => void
+  selectedSubcategoryName: string | null
+  setSelectedSubcategoryName: (subcategoryName: string | null) => void
   showOnlyNew: boolean
   setShowOnlyNew: (show: boolean) => void
   showOnlyOnSale: boolean
@@ -20,15 +20,15 @@ const FilterContext = createContext<FilterContextType | undefined>(undefined)
 
 export function FilterProvider({ children }: { children: ReactNode }) {
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
-  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<string | null>(null)
+  const [selectedCategoryName, setSelectedCategoryName] = useState<string | null>(null)
+  const [selectedSubcategoryName, setSelectedSubcategoryName] = useState<string | null>(null)
   const [showOnlyNew, setShowOnlyNew] = useState(false)
   const [showOnlyOnSale, setShowOnlyOnSale] = useState(false)
 
   const clearFilters = () => {
     setSearchQuery("")
-    setSelectedCategoryId(null)
-    setSelectedSubcategoryId(null)
+    setSelectedCategoryName(null)
+    setSelectedSubcategoryName(null)
     setShowOnlyNew(false)
     setShowOnlyOnSale(false)
   }
@@ -38,10 +38,10 @@ export function FilterProvider({ children }: { children: ReactNode }) {
       value={{
         searchQuery,
         setSearchQuery,
-        selectedCategoryId,
-        setSelectedCategoryId,
-        selectedSubcategoryId,
-        setSelectedSubcategoryId,
+        selectedCategoryName,
+        setSelectedCategoryName,
+        selectedSubcategoryName,
+        setSelectedSubcategoryName,
         showOnlyNew,
         setShowOnlyNew,
         showOnlyOnSale,

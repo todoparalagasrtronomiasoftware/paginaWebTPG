@@ -28,15 +28,15 @@ interface TransformedProduct {
   description?: string
 }
 
-// Filters interface (removed brandId)
+// Filters interface (updated for names)
 interface ProductFilters {
   searchQuery?: string
-  categoryId?: string
-  subcategoryId?: string
+  categoryName?: string
+  subcategoryName?: string
   isNew?: boolean
   isOnSale?: boolean
   limit?: number
-  page?: number // zero-based page index
+  page?: number
 }
 
 export function useProducts(filters: ProductFilters = {}) {
@@ -46,7 +46,7 @@ export function useProducts(filters: ProductFilters = {}) {
   const [totalCount, setTotalCount] = useState<number | null>(null)
 
   // Extract individual filter values to avoid object recreation issues
-  const { searchQuery, categoryId, subcategoryId, isNew, isOnSale, limit, page } = filters
+  const { searchQuery, categoryName, subcategoryName, isNew, isOnSale, limit, page } = filters
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -57,8 +57,8 @@ export function useProducts(filters: ProductFilters = {}) {
         .from('products')
         .select(`
           *,
-          category:categories!category_id(name, slug),
-          subcategory:categories!subcategory_id(name, slug)
+          category:categories!products_category_name_fkey(name, slug),
+          subcategory:categories!products_subcategory_name_fkey(name, slug)
         `, { count: 'exact', head: false })
         .eq('is_active', true)
 
@@ -67,12 +67,12 @@ export function useProducts(filters: ProductFilters = {}) {
         query = query.or(`name.ilike.%${searchQuery}%,sku.ilike.%${searchQuery}%,brand.ilike.%${searchQuery}%`)
       }
       
-      if (categoryId) {
-        query = query.eq('category_id', categoryId)
+      if (categoryName) {
+        query = query.eq('category_name', categoryName)
       }
       
-      if (subcategoryId) {
-        query = query.eq('subcategory_id', subcategoryId)
+      if (subcategoryName) {
+        query = query.eq('subcategory_name', subcategoryName)
       }
       
       if (isNew) {
@@ -123,7 +123,7 @@ export function useProducts(filters: ProductFilters = {}) {
     } finally {
       setLoading(false)
     }
-  }, [searchQuery, categoryId, subcategoryId, isNew, isOnSale, limit, page])
+  }, [searchQuery, categoryName, subcategoryName, isNew, isOnSale, limit, page])
 
   useEffect(() => {
     fetchProducts()
@@ -151,7 +151,7 @@ export function useCategories() {
         .from('categories')
         .select('*')
         .eq('is_active', true)
-        .is('parent_id', null) // Only main categories
+        .is('parent_name', null) // Only main categories
         .order('name')
 
       if (error) throw error
@@ -187,18 +187,18 @@ export function useAllSubcategories() {
         .from('categories')
         .select('*')
         .eq('is_active', true)
-        .not('parent_id', 'is', null) // Only subcategories (has parent_id)
+        .not('parent_name', 'is', null) // Only subcategories (has parent_name)
         .order('name')
 
       if (error) throw error
       
-      // Group subcategories by parent_id
+      // Group subcategories by parent_name
       const grouped = (data || []).reduce((acc, subcategory) => {
-        const parentId = subcategory.parent_id!
-        if (!acc[parentId]) {
-          acc[parentId] = []
+        const parentName = subcategory.parent_name!
+        if (!acc[parentName]) {
+          acc[parentName] = []
         }
-        acc[parentId].push(subcategory)
+        acc[parentName].push(subcategory)
         return acc
       }, {} as Record<string, Category[]>)
       
@@ -216,19 +216,19 @@ export function useAllSubcategories() {
 }
 
 // Hook to fetch subcategories
-export function useSubcategories(categoryId?: string) {
+export function useSubcategories(categoryName?: string) {
   const [subcategories, setSubcategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (categoryId) {
+    if (categoryName) {
       fetchSubcategories()
     } else {
       setSubcategories([])
       setLoading(false)
     }
-  }, [categoryId])
+  }, [categoryName])
 
   const fetchSubcategories = async () => {
     try {
@@ -239,7 +239,7 @@ export function useSubcategories(categoryId?: string) {
         .from('categories')
         .select('*')
         .eq('is_active', true)
-        .eq('parent_id', categoryId)
+        .eq('parent_name', categoryName)
         .order('name')
 
       if (error) throw error

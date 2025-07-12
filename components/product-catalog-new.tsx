@@ -2,7 +2,7 @@
 
 import { ProductCardNew as ProductCard } from "./product-card-new"
 import { useFilter } from "@/components/filter-context"
-import { useProducts, useCategories, useAllSubcategories } from "@/hooks/useProducts"
+import { useProducts } from "@/hooks/useProducts"
 import { Database } from "@/lib/supabase"
 import { useState, useEffect } from "react"
 
@@ -14,8 +14,8 @@ export function ProductCatalogNew() {
 
   const { 
     searchQuery, 
-    selectedCategoryId, 
-    selectedSubcategoryId, 
+    selectedCategoryName,
+    selectedSubcategoryName,
     showOnlyNew,
     showOnlyOnSale
   } = useFilter()
@@ -23,36 +23,18 @@ export function ProductCatalogNew() {
   // Fetch data from Supabase
   const { products, loading: productsLoading, error: productsError, totalCount } = useProducts({
     searchQuery,
-    categoryId: selectedCategoryId || undefined,
-    subcategoryId: selectedSubcategoryId || undefined,
+    categoryName: selectedCategoryName || undefined,
+    subcategoryName: selectedSubcategoryName || undefined,
     isNew: showOnlyNew,
     isOnSale: showOnlyOnSale,
     limit,
     page
   })
 
-  const { categories, loading: categoriesLoading } = useCategories()
-  const { subcategoriesByCategory } = useAllSubcategories();
-
-  // Find category names for display
-  const getCategoryName = (categoryId: string | null): string | null => {
-    if (!categoryId || !categories || categories.length === 0) return null
-    const category = categories.find((cat: Category) => cat.id === categoryId)
-    return category?.name || null
-  }
-
-  const getSubcategoryName = (subcategoryId: string | null): string | null => {
-    if (!subcategoryId || !subcategoriesByCategory) return null;
-    // Flatten all subcategories into a single array
-    const allSubcategories = Object.values(subcategoriesByCategory).flat();
-    const subcat = allSubcategories.find((sc) => sc.id === subcategoryId);
-    return subcat?.name || null;
-  };
-
   // Reset to first page when filters change
   useEffect(() => {
     setPage(0)
-  }, [searchQuery, selectedCategoryId, selectedSubcategoryId, showOnlyNew, showOnlyOnSale])
+  }, [searchQuery, selectedCategoryName, selectedSubcategoryName, showOnlyNew, showOnlyOnSale])
 
   // Pagination controls
   const hasPrev = page > 0
@@ -91,16 +73,16 @@ export function ProductCatalogNew() {
 
   // log category and subcategory names
   console.log("categories")
-  console.log("selectedCategoryId", getCategoryName(selectedCategoryId))
-  console.log("selectedSubcategoryId", getSubcategoryName(selectedSubcategoryId))
-  console.log("selectedCategoryId", selectedCategoryId)
-  console.log("selectedSubcategoryId", selectedSubcategoryId)
+  console.log("selectedCategoryId", selectedCategoryName)
+  console.log("selectedSubcategoryId", selectedSubcategoryName)
+  console.log("selectedCategoryId", selectedCategoryName)
+  console.log("selectedSubcategoryId", selectedSubcategoryName)
   console.log("end of log")
 
   return (
     <div className="container mx-auto px-4 py-4">
       {/* Filtros Activos */}
-      {(searchQuery || selectedCategoryId || selectedSubcategoryId || showOnlyNew || showOnlyOnSale) && (
+      {(searchQuery || selectedCategoryName || selectedSubcategoryName || showOnlyNew || showOnlyOnSale) && (
         <div className="mb-6">
           <div className="flex flex-wrap gap-2 items-center">
             <span className="text-sm text-gray-600">Filtros activos:</span>
@@ -109,14 +91,14 @@ export function ProductCatalogNew() {
                 Búsqueda: "{searchQuery}"
               </span>
             )}
-            {selectedCategoryId && (
+            {selectedCategoryName && (
               <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                Categoría: {getCategoryName(selectedCategoryId)}
+                Categoría: {selectedCategoryName}
               </span>
             )}
-            {selectedSubcategoryId && (
+            {selectedSubcategoryName && (
               <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">
-                Subcategoría: {getSubcategoryName(selectedSubcategoryId)}
+                Subcategoría: {selectedSubcategoryName}
               </span>
             )}
             {showOnlyNew && (
