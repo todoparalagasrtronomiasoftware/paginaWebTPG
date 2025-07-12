@@ -36,15 +36,17 @@ interface ProductFilters {
   isNew?: boolean
   isOnSale?: boolean
   limit?: number
+  page?: number // zero-based page index
 }
 
 export function useProducts(filters: ProductFilters = {}) {
   const [products, setProducts] = useState<TransformedProduct[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [totalCount, setTotalCount] = useState<number | null>(null)
 
   // Extract individual filter values to avoid object recreation issues
-  const { searchQuery, categoryId, subcategoryId, isNew, isOnSale, limit } = filters
+  const { searchQuery, categoryId, subcategoryId, isNew, isOnSale, limit, page } = filters
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -57,7 +59,7 @@ export function useProducts(filters: ProductFilters = {}) {
           *,
           category:categories!category_id(name, slug),
           subcategory:categories!subcategory_id(name, slug)
-        `)
+        `, { count: 'exact', head: false })
         .eq('is_active', true)
 
       // Apply filters using individual values
@@ -81,9 +83,15 @@ export function useProducts(filters: ProductFilters = {}) {
         query = query.eq('is_on_sale', true)
       }
 
-      const { data, error } = await query
-        .order('created_at', { ascending: false })
-        .limit(limit || 50)
+      let supabaseQuery = query.order('created_at', { ascending: false })
+      let from = 0
+      let to = (limit || 50) - 1
+      if (typeof page === 'number' && typeof limit === 'number') {
+        from = page * limit
+        to = from + limit - 1
+      }
+      supabaseQuery = supabaseQuery.range(from, to)
+      const { data, error, count } = await supabaseQuery
 
       if (error) throw error
       
@@ -105,21 +113,23 @@ export function useProducts(filters: ProductFilters = {}) {
       }))
       
       setProducts(transformedProducts)
+      setTotalCount(typeof count === 'number' ? count : null)
     } catch (error: any) {
       setError(error.message)
       console.error('Error fetching products:', error)
       // Fallback to empty array if there's an error
       setProducts([])
+      setTotalCount(null)
     } finally {
       setLoading(false)
     }
-  }, [searchQuery, categoryId, subcategoryId, isNew, isOnSale, limit])
+  }, [searchQuery, categoryId, subcategoryId, isNew, isOnSale, limit, page])
 
   useEffect(() => {
     fetchProducts()
   }, [fetchProducts])
 
-  return { products, loading, error, refetch: fetchProducts }
+  return { products, loading, error, totalCount, refetch: fetchProducts }
 }
 
 // Hook to fetch categories

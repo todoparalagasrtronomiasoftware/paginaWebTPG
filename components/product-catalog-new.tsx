@@ -2,12 +2,16 @@
 
 import { ProductCardNew as ProductCard } from "./product-card-new"
 import { useFilter } from "@/components/filter-context"
-import { useProducts, useCategories } from "@/hooks/useProducts"
+import { useProducts, useCategories, useAllSubcategories } from "@/hooks/useProducts"
 import { Database } from "@/lib/supabase"
+import { useState, useEffect } from "react"
 
 type Category = Database['public']['Tables']['categories']['Row']
 
 export function ProductCatalogNew() {
+  const [page, setPage] = useState(0)
+  const limit = 10
+
   const { 
     searchQuery, 
     selectedCategoryId, 
@@ -17,22 +21,58 @@ export function ProductCatalogNew() {
   } = useFilter()
 
   // Fetch data from Supabase
-  const { products, loading: productsLoading, error: productsError } = useProducts({
+  const { products, loading: productsLoading, error: productsError, totalCount } = useProducts({
     searchQuery,
     categoryId: selectedCategoryId || undefined,
     subcategoryId: selectedSubcategoryId || undefined,
     isNew: showOnlyNew,
     isOnSale: showOnlyOnSale,
-    limit: 50
+    limit,
+    page
   })
 
   const { categories, loading: categoriesLoading } = useCategories()
+  const { subcategoriesByCategory } = useAllSubcategories();
 
   // Find category names for display
   const getCategoryName = (categoryId: string | null): string | null => {
     if (!categoryId || !categories || categories.length === 0) return null
     const category = categories.find((cat: Category) => cat.id === categoryId)
     return category?.name || null
+  }
+
+  const getSubcategoryName = (subcategoryId: string | null): string | null => {
+    if (!subcategoryId || !subcategoriesByCategory) return null;
+    // Flatten all subcategories into a single array
+    const allSubcategories = Object.values(subcategoriesByCategory).flat();
+    const subcat = allSubcategories.find((sc) => sc.id === subcategoryId);
+    return subcat?.name || null;
+  };
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setPage(0)
+  }, [searchQuery, selectedCategoryId, selectedSubcategoryId, showOnlyNew, showOnlyOnSale])
+
+  // Pagination controls
+  const hasPrev = page > 0
+  const totalPages = totalCount ? Math.ceil(totalCount / limit) : null
+  const hasNext = totalPages ? page < totalPages - 1 : products.length === limit
+  let pageNumbers: number[] = []
+  if (totalPages) {
+    // Show up to 5 page numbers centered on current page
+    let start = Math.max(0, page - 2)
+    let end = Math.min(totalPages - 1, page + 2)
+    if (page <= 1) end = Math.min(totalPages - 1, 4)
+    if (page >= (totalPages - 2)) start = Math.max(0, totalPages - 5)
+    for (let i = start; i <= end; i++) {
+      pageNumbers.push(i)
+    }
+  } else {
+    for (let i = Math.max(0, page - 2); i <= page + 2; i++) {
+      if (i < 0) continue
+      pageNumbers.push(i)
+    }
   }
 
   if (productsError) {
@@ -48,6 +88,14 @@ export function ProductCatalogNew() {
       </div>
     )
   }
+
+  // log category and subcategory names
+  console.log("categories")
+  console.log("selectedCategoryId", getCategoryName(selectedCategoryId))
+  console.log("selectedSubcategoryId", getSubcategoryName(selectedSubcategoryId))
+  console.log("selectedCategoryId", selectedCategoryId)
+  console.log("selectedSubcategoryId", selectedSubcategoryId)
+  console.log("end of log")
 
   return (
     <div className="container mx-auto px-4 py-4">
@@ -68,7 +116,7 @@ export function ProductCatalogNew() {
             )}
             {selectedSubcategoryId && (
               <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">
-                Subcategoría: {getCategoryName(selectedSubcategoryId)}
+                Subcategoría: {getSubcategoryName(selectedSubcategoryId)}
               </span>
             )}
             {showOnlyNew && (
@@ -97,7 +145,7 @@ export function ProductCatalogNew() {
       {!productsLoading && (
         <div className="mb-4">
           <span className="text-sm text-gray-600">
-            {products.length} productos encontrados
+            {(totalCount ?? products.length)} productos encontrados
           </span>
         </div>
       )}
@@ -108,6 +156,36 @@ export function ProductCatalogNew() {
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
+        </div>
+      )}
+
+      {/* Pagination Controls */}
+      {!productsLoading && products.length > 0 && (
+        <div className="flex justify-center items-center gap-2 mt-8 mb-4">
+          <button
+            className="px-3 py-1 rounded border text-sm disabled:opacity-50"
+            onClick={() => setPage(page - 1)}
+            disabled={!hasPrev}
+          >
+            &lt; anterior
+          </button>
+          {pageNumbers.map((num) => (
+            <button
+              key={num}
+              className={`px-3 py-1 rounded border text-sm ${num === page ? 'bg-emerald-600 text-white font-bold border-emerald-600' : 'bg-white text-gray-700 border-gray-200 hover:bg-emerald-50'}`}
+              onClick={() => setPage(num)}
+              disabled={num === page}
+            >
+              {num + 1}
+            </button>
+          ))}
+          <button
+            className="px-3 py-1 rounded border text-sm disabled:opacity-50"
+            onClick={() => setPage(page + 1)}
+            disabled={!hasNext}
+          >
+            siguiente &gt;
+          </button>
         </div>
       )}
 
