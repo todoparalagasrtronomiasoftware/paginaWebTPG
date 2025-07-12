@@ -1,13 +1,10 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useMemo } from "react"
 import { ProductCardNew as ProductCard } from "./product-card-new"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Search } from "lucide-react"
+import { useFilter } from "@/components/filter-context"
 
-// Productos expandidos con las nuevas imágenes
+// Productos expandidos con las nuevas imágenes y categorías del menú
 const sampleProducts = [
   {
     id: "1",
@@ -18,7 +15,8 @@ const sampleProducts = [
     bulkPrice: 2650,
     isNew: true,
     brand: "Cumaná",
-    category: "Conservas",
+    category: "Almacén",
+    subcategory: "Enlatados",
   },
   {
     id: "2",
@@ -28,7 +26,8 @@ const sampleProducts = [
     price: 1890,
     bulkPrice: 1750,
     brand: "Cumaná",
-    category: "Aderezos",
+    category: "Almacén",
+    subcategory: "Condimentos",
   },
   {
     id: "3",
@@ -39,7 +38,8 @@ const sampleProducts = [
     bulkPrice: 3950,
     isOnSale: true,
     brand: "Savora",
-    category: "Aderezos",
+    category: "Almacén",
+    subcategory: "Condimentos",
   },
   {
     id: "4",
@@ -49,7 +49,8 @@ const sampleProducts = [
     price: 3200,
     bulkPrice: 2950,
     brand: "Cumaná",
-    category: "Aderezos",
+    category: "Almacén",
+    subcategory: "Condimentos",
   },
   {
     id: "5",
@@ -59,7 +60,8 @@ const sampleProducts = [
     price: 890,
     bulkPrice: 820,
     brand: "Pennisi",
-    category: "Conservas",
+    category: "Almacén",
+    subcategory: "Enlatados",
   },
   {
     id: "6",
@@ -69,7 +71,8 @@ const sampleProducts = [
     price: 1650,
     bulkPrice: 1520,
     brand: "Marolio",
-    category: "Conservas",
+    category: "Almacén",
+    subcategory: "Enlatados",
   },
   {
     id: "7",
@@ -80,6 +83,7 @@ const sampleProducts = [
     bulkPrice: 8200,
     brand: "La Paulina",
     category: "Lácteos",
+    subcategory: "Mantecas",
   },
   {
     id: "8",
@@ -89,7 +93,8 @@ const sampleProducts = [
     price: 450,
     bulkPrice: 420,
     brand: "Genser",
-    category: "Aderezos",
+    category: "Almacén",
+    subcategory: "Condimentos",
   },
   {
     id: "9",
@@ -100,7 +105,8 @@ const sampleProducts = [
     bulkPrice: 1950,
     isNew: true,
     brand: "Safra",
-    category: "Aderezos",
+    category: "Almacén",
+    subcategory: "Condimentos",
   },
   {
     id: "10",
@@ -110,7 +116,8 @@ const sampleProducts = [
     price: 6800,
     bulkPrice: 6300,
     brand: "Emeth",
-    category: "Conservas",
+    category: "Almacén",
+    subcategory: "Enlatados",
   },
   {
     id: "11",
@@ -120,9 +127,9 @@ const sampleProducts = [
     price: 1750,
     bulkPrice: 1620,
     brand: "Cumaná",
-    category: "Conservas",
+    category: "Almacén",
+    subcategory: "Enlatados",
   },
-  // Productos adicionales para llegar a 15
   {
     id: "12",
     name: "Cumaná Aceitunas Verdes 500g",
@@ -131,7 +138,8 @@ const sampleProducts = [
     price: 1200,
     bulkPrice: 1100,
     brand: "Cumaná",
-    category: "Conservas",
+    category: "Almacén",
+    subcategory: "Enlatados",
   },
   {
     id: "13",
@@ -142,7 +150,8 @@ const sampleProducts = [
     bulkPrice: 2150,
     isOnSale: true,
     brand: "Savora",
-    category: "Aderezos",
+    category: "Almacén",
+    subcategory: "Condimentos",
   },
   {
     id: "14",
@@ -153,6 +162,7 @@ const sampleProducts = [
     bulkPrice: 3200,
     brand: "La Paulina",
     category: "Lácteos",
+    subcategory: "Quesos",
   },
   {
     id: "15",
@@ -163,18 +173,83 @@ const sampleProducts = [
     bulkPrice: 890,
     isNew: true,
     brand: "Marolio",
-    category: "Conservas",
+    category: "Almacén",
+    subcategory: "Enlatados",
+  },
+  // Productos adicionales para cubrir más categorías
+  {
+    id: "16",
+    name: "Coca Cola 2.25L",
+    sku: "COC-COL-225",
+    image: "/placeholder.svg?height=300&width=300",
+    price: 1450,
+    bulkPrice: 1350,
+    brand: "Coca Cola",
+    category: "Bebidas",
+    subcategory: "Gaseosas",
+  },
+  {
+    id: "17",
+    name: "Quilmes Cerveza 1L",
+    sku: "QUI-CER-1L",
+    image: "/placeholder.svg?height=300&width=300",
+    price: 890,
+    bulkPrice: 820,
+    brand: "Quilmes",
+    category: "Bebidas",
+    subcategory: "Cervezas",
+  },
+  {
+    id: "18",
+    name: "Bife de Chorizo 1kg",
+    sku: "CAR-BIF-1KG",
+    image: "/placeholder.svg?height=300&width=300",
+    price: 8500,
+    bulkPrice: 8200,
+    brand: "Frigorífico",
+    category: "Carnes",
+    subcategory: "Res",
+  },
+  {
+    id: "19",
+    name: "Pan Francés x6",
+    sku: "PAN-FRA-6U",
+    image: "/placeholder.svg?height=300&width=300",
+    price: 650,
+    bulkPrice: 600,
+    brand: "Panadería",
+    category: "Panadería",
+    subcategory: "Panes",
+  },
+  {
+    id: "20",
+    name: "Espátula de Cocina",
+    sku: "ESP-COC-001",
+    image: "/placeholder.svg?height=300&width=300",
+    price: 2200,
+    bulkPrice: 2050,
+    brand: "Tramontina",
+    category: "Equipamiento",
+    subcategory: "Utensilios",
   },
 ]
 
-const categories = ["Todas", "Conservas", "Aderezos", "Harinas", "Lácteos", "Bebidas"]
-const brands = ["Todas", "Cumaná", "Savora", "La Paulina", "Pennisi", "Marolio", "Genser", "Safra", "Emeth"]
+const categories = ["Todas", "Almacén", "Bebidas", "Lácteos", "Carnes", "Panadería", "Equipamiento"]
+const brands = ["Todas", "Cumaná", "Savora", "La Paulina", "Pennisi", "Marolio", "Genser", "Safra", "Emeth", "Coca Cola", "Quilmes", "Frigorífico", "Panadería", "Tramontina"]
 
 export function ProductCatalogNew() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState("Todas")
-  const [selectedBrand, setSelectedBrand] = useState("Todas")
-  const [showOnlyNew, setShowOnlyNew] = useState(false)
+  const { 
+    searchQuery, 
+    setSearchQuery, 
+    selectedCategory, 
+    setSelectedCategory, 
+    selectedSubcategory, 
+    setSelectedSubcategory, 
+    selectedBrand, 
+    setSelectedBrand, 
+    showOnlyNew, 
+    setShowOnlyNew 
+  } = useFilter()
 
   const filteredProducts = useMemo(() => {
     return sampleProducts.filter((product) => {
@@ -184,20 +259,60 @@ export function ProductCatalogNew() {
         product.brand.toLowerCase().includes(searchQuery.toLowerCase())
 
       const matchesCategory = selectedCategory === "Todas" || product.category === selectedCategory
+      const matchesSubcategory = selectedSubcategory === "Todas" || product.subcategory === selectedSubcategory
       const matchesBrand = selectedBrand === "Todas" || product.brand === selectedBrand
       const matchesNew = !showOnlyNew || product.isNew
 
-      return matchesSearch && matchesCategory && matchesBrand && matchesNew
+      return matchesSearch && matchesCategory && matchesSubcategory && matchesBrand && matchesNew
     })
-  }, [searchQuery, selectedCategory, selectedBrand, showOnlyNew])
+  }, [searchQuery, selectedCategory, selectedSubcategory, selectedBrand, showOnlyNew])
 
   return (
     <div className="container mx-auto px-4 py-4">
-      {/* Filtros Horizontales - Más compactos */}
+      {/* Filtros Activos */}
+      {(searchQuery || selectedCategory !== "Todas" || selectedSubcategory !== "Todas" || selectedBrand !== "Todas" || showOnlyNew) && (
+        <div className="mb-6">
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-sm text-gray-600">Filtros activos:</span>
+            {searchQuery && (
+              <span className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm">
+                Búsqueda: "{searchQuery}"
+              </span>
+            )}
+            {selectedCategory !== "Todas" && (
+              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                Categoría: {selectedCategory}
+              </span>
+            )}
+            {selectedSubcategory !== "Todas" && (
+              <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">
+                Subcategoría: {selectedSubcategory}
+              </span>
+            )}
+            {selectedBrand !== "Todas" && (
+              <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm">
+                Marca: {selectedBrand}
+              </span>
+            )}
+            {showOnlyNew && (
+              <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+                Solo nuevos
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Resultados */}
+      <div className="mb-4">
+        <span className="text-sm text-gray-600">
+          {filteredProducts.length} productos encontrados
+        </span>
+      </div>
 
       {/* Grid de Productos - Optimizado para mostrar más productos */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-        {filteredProducts.slice(0, 15).map((product) => (
+        {filteredProducts.slice(0, 20).map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>

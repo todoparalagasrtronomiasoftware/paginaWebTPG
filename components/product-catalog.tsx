@@ -10,47 +10,7 @@ import { Slider } from "@/components/ui/slider"
 import { Search, Filter, Grid, List } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-// Sample products data
-const sampleProducts = [
-  {
-    id: "1",
-    name: "Cumaná Palmitos en Conserva 800g",
-    sku: "CUM-PAL-800",
-    image: "/images/cumana-palmitos.png",
-    price: 2850,
-    bulkPrice: 2650,
-    stock: 45,
-    moq: 6,
-    isNew: true,
-    brand: "Cumaná",
-    category: "Conservas",
-  },
-  {
-    id: "2",
-    name: "Cumaná Condimento para Pizza 1kg",
-    sku: "CUM-PIZ-1KG",
-    image: "/images/cumana-condimento.png",
-    price: 1890,
-    bulkPrice: 1750,
-    stock: 23,
-    moq: 12,
-    brand: "Cumaná",
-    category: "Aderezos",
-  },
-  {
-    id: "3",
-    name: "Savora Mostaza Original 3kg",
-    sku: "SAV-MOS-3KG",
-    image: "/images/savora-mostaza.png",
-    price: 4250,
-    bulkPrice: 3950,
-    stock: 18,
-    moq: 4,
-    isOnSale: true,
-    brand: "Savora",
-    category: "Aderezos",
-  },
-]
+
 
 const categories = ["Todas", "Conservas", "Aderezos", "Harinas", "Lácteos", "Bebidas", "Equipamiento"]
 const brands = ["Todas", "Cumaná", "Savora", "La Serenísima", "Molinos Río de la Plata"]

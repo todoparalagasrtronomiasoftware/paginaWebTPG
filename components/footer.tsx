@@ -16,7 +16,7 @@ export function Footer() {
           {/* Company Info */}
           <div className="md:col-span-2">
             <Image
-              src="/images/tpg-logo.webp"
+              src="/images/tpg-logo.png"
               alt="TPG - Todo Para la Gastronomía"
               width={150}
               height={75}
