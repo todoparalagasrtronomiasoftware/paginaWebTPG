@@ -1,85 +1,26 @@
 "use client"
 
+import { useState } from "react"
 import { Search, Menu, ShoppingCart, User, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useState } from "react"
-import Image from "next/image"
 import { useFilter } from "@/components/filter-context"
+import { useCategories, useAllSubcategories } from "@/hooks/useProducts"
+import Image from "next/image"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
-  const { searchQuery, setSearchQuery, setSelectedCategory, setSelectedSubcategory, clearFilters } = useFilter()
+  const { searchQuery, setSearchQuery, setSelectedCategoryId, setSelectedSubcategoryId, clearFilters } = useFilter()
+  
+  // Fetch categories and all subcategories from database
+  const { categories, loading: categoriesLoading } = useCategories()
+  const { subcategoriesByCategory, loading: subcategoriesLoading } = useAllSubcategories()
 
   const navItems = [
-    { name: "Catálogo", href: "/" },
-    { name: "Marcas", href: "/marcas" },
-    { name: "Promociones", href: "/promociones" },
     { name: "Nosotros", href: "/nosotros" },
-  ]
-
-  const categories = [
-    {
-      name: "Almacén",
-      subcategories: [
-        { name: "Aceites" },
-        { name: "Enlatados" },
-        { name: "Snacks" },
-        { name: "Harinas" },
-        { name: "Condimentos" },
-      ],
-    },
-    {
-      name: "Bebidas",
-      subcategories: [
-        { name: "Gaseosas" },
-        { name: "Cervezas" },
-        { name: "Vinos" },
-        { name: "Jugos" },
-        { name: "Aguas" },
-      ],
-    },
-    {
-      name: "Lácteos",
-      subcategories: [
-        { name: "Quesos" },
-        { name: "Leches" },
-        { name: "Yogures" },
-        { name: "Mantecas" },
-        { name: "Cremas" },
-      ],
-    },
-    {
-      name: "Carnes",
-      subcategories: [
-        { name: "Res" },
-        { name: "Pollo" },
-        { name: "Cerdo" },
-        { name: "Pescados" },
-        { name: "Embutidos" },
-      ],
-    },
-    {
-      name: "Panadería",
-      subcategories: [
-        { name: "Panes" },
-        { name: "Facturas" },
-        { name: "Masas" },
-        { name: "Tortas" },
-        { name: "Ingredientes" },
-      ],
-    },
-    {
-      name: "Equipamiento",
-      subcategories: [
-        { name: "Cocina" },
-        { name: "Servicio" },
-        { name: "Limpieza" },
-        { name: "Refrigeración" },
-        { name: "Utensilios" },
-      ],
-    },
+    { name: "Catálogo", href: "/catalogo" },
+    { name: "Contacto", href: "#contacto" },
   ]
 
   const handleSearch = (e: React.FormEvent) => {
@@ -87,15 +28,15 @@ export function Header() {
     // La búsqueda se maneja automáticamente por el contexto
   }
 
-  const handleCategoryClick = (categoryName: string) => {
-    setSelectedCategory(categoryName)
-    setSelectedSubcategory("Todas")
+  const handleCategoryClick = (categoryId: string) => {
+    setSelectedCategoryId(categoryId)
+    setSelectedSubcategoryId(null)
     setIsCategoriesOpen(false)
   }
 
-  const handleSubcategoryClick = (categoryName: string, subcategoryName: string) => {
-    setSelectedCategory(categoryName)
-    setSelectedSubcategory(subcategoryName)
+  const handleSubcategoryClick = (categoryId: string, subcategoryId: string) => {
+    setSelectedCategoryId(categoryId)
+    setSelectedSubcategoryId(subcategoryId)
     setIsCategoriesOpen(false)
   }
 
@@ -175,19 +116,19 @@ export function Header() {
                   onMouseLeave={() => setIsCategoriesOpen(false)}
                 >
                   <div className="grid grid-cols-2 lg:grid-cols-3 gap-0 p-4 w-[600px] lg:w-[800px]">
-                    {categories.map((category) => (
-                      <div key={category.name} className="p-3">
+                    {!categoriesLoading && categories.map((category) => (
+                      <div key={category.id} className="p-3">
                         <h3 
                           className="font-semibold text-emerald-600 text-sm mb-2 border-b border-gray-100 pb-1 cursor-pointer hover:text-emerald-700"
-                          onClick={() => handleCategoryClick(category.name)}
+                          onClick={() => handleCategoryClick(category.id)}
                         >
                           {category.name}
                         </h3>
                         <ul className="space-y-1">
-                          {category.subcategories.map((subcategory) => (
-                            <li key={subcategory.name}>
+                          {!subcategoriesLoading && subcategoriesByCategory[category.id]?.map((subcategory) => (
+                            <li key={subcategory.id}>
                               <button
-                                onClick={() => handleSubcategoryClick(category.name, subcategory.name)}
+                                onClick={() => handleSubcategoryClick(category.id, subcategory.id)}
                                 className="block text-xs text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 px-2 py-1 rounded transition-colors w-full text-left"
                               >
                                 {subcategory.name}
