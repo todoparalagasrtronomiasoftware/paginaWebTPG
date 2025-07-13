@@ -2,7 +2,7 @@
 
 import { useCart } from "@/components/cart-context"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
@@ -33,18 +33,24 @@ export function CartModal({ children }: CartModalProps) {
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col [&>button.absolute]:hidden">
         <DialogHeader className="pb-4">
-          <DialogTitle className="flex items-center gap-3 text-xl font-bold">
+          <DialogTitle className="flex items-center justify-between gap-3 text-xl font-bold w-full">
             <div className="p-2 bg-emerald-100 rounded-lg">
               <ShoppingCart className="h-6 w-6 text-emerald-600" />
             </div>
-            Carrito de Compras
-            {getTotalItems() > 0 && (
-              <Badge variant="secondary" className="ml-2 px-3 py-1 text-sm bg-emerald-100 text-emerald-800">
-                {getTotalItems()} {getTotalItems() === 1 ? 'artículo' : 'artículos'}
-              </Badge>
-            )}
+            <span className="flex-1 text-center">Carrito de Compras</span>
+            <DialogClose asChild>
+              <button
+                className="bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
+                aria-label="Cerrar"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </DialogClose>
+            
           </DialogTitle>
         </DialogHeader>
 
@@ -63,9 +69,9 @@ export function CartModal({ children }: CartModalProps) {
                 <div className="space-y-4 pr-4">
                   {items.map((item) => (
                     <div key={`${item.id}_${item.unitType}`} className="bg-white border-2 border-gray-100 rounded-xl px-4 py-3 hover:border-emerald-200 transition-colors shadow-sm">
-                      <div className="flex items-center justify-between gap-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         {/* Left: Image + Info */}
-                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="flex items-center gap-3 min-w-0 flex-1 mb-2 sm:mb-0">
                           <div className="w-16 h-16 bg-gray-50 rounded-lg border flex items-center justify-center overflow-hidden flex-shrink-0">
                             <Image
                               src={item.image || "/placeholder.svg"}
@@ -85,8 +91,8 @@ export function CartModal({ children }: CartModalProps) {
                           </div>
                         </div>
                         {/* Right: Controls */}
-                        <div className="flex flex-col items-end gap-1 min-w-[210px]">
-                          <div className="flex items-center gap-2 mb-1">
+                        <div className="flex flex-col items-end gap-1 min-w-0 w-full sm:w-auto">
+                          <div className="flex items-center gap-2 mb-1 w-full sm:w-auto justify-end">
                             <Badge 
                               variant="outline" 
                               className={`text-xs px-2 py-0.5 ${item.unitType === 'bulk' ? 'border-orange-200 text-orange-700 bg-orange-50' : 'border-emerald-200 text-emerald-700 bg-emerald-50'}`}
@@ -111,7 +117,7 @@ export function CartModal({ children }: CartModalProps) {
                               <Plus className="h-4 w-4" />
                             </Button>
                           </div>
-                          <div className="flex items-center gap-2 mt-1">
+                          <div className="flex items-center gap-2 mt-1 w-full sm:w-auto justify-end">
                             <span className="text-xs text-gray-500">Subtotal</span>
                             <span className="font-bold text-emerald-600 text-base ml-1">
                               ${((item.unitType === 'bulk' && item.bulkPrice ? item.bulkPrice : item.price) * item.quantity).toLocaleString("es-AR")}
