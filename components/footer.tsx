@@ -15,13 +15,6 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="md:col-span-2">
-            <Image
-              src="/images/tpg-logo.png"
-              alt="TPG - Todo Para la Gastronomía"
-              width={150}
-              height={75}
-              className="h-16 w-auto mb-4 brightness-0 invert"
-            />
             <p className="text-gray-300 mb-6 max-w-md">
               Distribuidor mayorista líder en Argentina. Más de 20 años abasteciendo a restaurantes, bares y hoteles con
               productos de la más alta calidad.

@@ -41,7 +41,7 @@ export function ProductCard({ product }: ProductCardProps) {
     >
       <CardContent className="p-3">
         {/* Image - Optimizada */}
-        <div className="relative mb-3 overflow-hidden rounded-lg bg-gray-50">
+        <div className="relative mb-3 overflow-hidden rounded-lg bg-white">
           <Image
             src={product.image || "/placeholder.svg"}
             alt={product.name}

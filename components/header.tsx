@@ -21,8 +21,8 @@ export function Header() {
   const { subcategoriesByCategory, loading: subcategoriesLoading } = useAllSubcategories()
 
   const navItems = [
-    { name: "Nosotros", href: "/nosotros" },
     { name: "Catálogo", href: "/catalogo" },
+    { name: "Nosotros", href: "/nosotros" },
     { name: "Contacto", href: "#contacto" },
   ]
 
