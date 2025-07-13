@@ -1,5 +1,5 @@
 import { Header } from "@/components/header"
-import { ProductCatalogNew } from "@/components/product-catalog-new"
+import { ProductCatalog } from "@/components/product-catalog"
 import { Footer } from "@/components/footer"
 import { WhatsAppButton } from "@/components/whatsapp-button"
 import { FilterProvider } from "@/components/filter-context"
@@ -11,7 +11,7 @@ export default function CatalogoPage() {
       <CartProvider>
         <FilterProvider>
           <Header />
-          <ProductCatalogNew />
+          <ProductCatalog />
         </FilterProvider>
       </CartProvider>
       <Footer />
