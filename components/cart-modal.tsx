@@ -82,7 +82,7 @@ export function CartModal({ children }: CartModalProps) {
                             />
                           </div>
                           <div className="min-w-0">
-                            <h4 className="font-bold text-sm text-gray-900 leading-tight mb-0.5 line-clamp-2">{item.name}</h4>
+                            <h4 className="font-bold text-sm text-gray-900 leading-tight mb-0.5">{item.name}</h4>
                             <div className="flex items-center gap-2 text-xs text-gray-600 mb-1">
                               <span className="font-medium truncate">{item.brand}</span>
                               <span className="text-gray-400">•</span>

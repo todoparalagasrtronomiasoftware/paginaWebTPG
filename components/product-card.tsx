@@ -69,7 +69,7 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
 
           {/* Nombre del producto */}
-          <h3 className="font-bold text-gray-900 text-sm leading-tight min-h-[2.5rem] line-clamp-2">{product.name}</h3>
+          <h3 className="font-bold text-gray-900 text-sm leading-tight min-h-[2.5rem]">{product.name}</h3>
 
           {/* Precios */}
           <div className="space-y-1">
